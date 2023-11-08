@@ -109,4 +109,45 @@ public class PersonDaoImpl implements PersonDao{
         return persons;
     }
 
+    public int getPersonId(String firstname){
+
+        String query = "SELECT person_id FROM persons WHERE firstname = ?";
+
+        int personId = 0;
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, firstname);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                personId = resultSet.getInt("person_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return personId;
+    }
+
+    public String getPersonName(int personId){
+
+        String query = "SELECT firstname FROM persons WHERE person_id = ?";
+
+        String personName = "";
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, personId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                personName = resultSet.getString("firstname");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return personName;
+    }
+
+
 }

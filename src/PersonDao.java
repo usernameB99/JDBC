@@ -20,4 +20,8 @@ public interface PersonDao {
 
     public ArrayList<Person> getPersonsByHousehold(int householdId);
 
+    public int getPersonId(String firstname);
+
+    public String getPersonName(int personId);
+
 }

@@ -20,8 +20,11 @@ private PetDao petDao;
 
 
         do{
-            int selectedHousehold = 0;
+            int selectedHouseholdId = 0;
             String selectedHouseholdName = "";
+
+            int selectedPersonId = 0;
+            String selectedPersonName = "";
 
             System.out.println("wählen sie:");
             System.out.println("1.) Haushalt auswählen aus liste");
@@ -38,8 +41,8 @@ private PetDao petDao;
                     System.out.println();
                     System.out.println("wählen sie einen haushalt aus den sie verwenden möchteeeen:");
                     select = sc.nextInt();
-                    selectedHousehold = selectedHousehold(verwaltung, select);  //choose haushalt, get id
-                    System.out.println(selectedHousehold); //kontrollausgabe
+                    selectedHouseholdId = selectedHousehold(verwaltung, select);  //choose haushalt, get id
+                    System.out.println(selectedHouseholdId); //kontrollausgabe
 
                 }
             }
@@ -50,11 +53,11 @@ private PetDao petDao;
                 String hNmae = sc.nextLine();
                 Household newHousehold = new Household(hNmae);
                 verwaltung.householdDao.addHousehold(newHousehold);  //neuer haushalt in datenbank eini
-                selectedHousehold = verwaltung.householdDao.getHouseholdId(hNmae);  // get id from creates haushalt
-                System.out.println(selectedHousehold);   //kontrollausgabe
+                selectedHouseholdId = verwaltung.householdDao.getHouseholdId(hNmae);  // get id from creates haushalt
+                System.out.println(selectedHouseholdId);   //kontrollausgabe
             }
 
-            selectedHouseholdName = verwaltung.householdDao.getHouseholdName(selectedHousehold);
+            selectedHouseholdName = verwaltung.householdDao.getHouseholdName(selectedHouseholdId);
 
             System.out.println("was wollen sie mit diesem haushalt machen? " + selectedHouseholdName);
             System.out.println("1.) Haushalt update");
@@ -66,7 +69,7 @@ private PetDao petDao;
             if(select == 1){  //UPDATE HAUSHALD
                 System.out.println("geben sie einen neuen namen für den haushalt ein:");
                 String newName = sc.nextLine();
-                verwaltung.householdDao.updateHousehold(selectedHousehold, newName);
+                verwaltung.householdDao.updateHousehold(selectedHouseholdId, newName);
                 System.out.println("name wurde von " + selectedHouseholdName + " auf " + newName + " geändert");
                 selectedHouseholdName = newName;  //reassign haushaltname
 
@@ -86,24 +89,87 @@ private PetDao petDao;
                 areYouSure = sc.nextInt();
                 if (areYouSure == 1){
                     System.out.println(selectedHouseholdName + " wird nun aus der Datenbank gelöscht");
-                    verwaltung.householdDao.deleteHousehold(selectedHousehold);     //löschen des haushaltes aus datenbank
+                    verwaltung.householdDao.deleteHousehold(selectedHouseholdId);     //löschen des haushaltes aus datenbank
                 } else{
                     System.out.println("daun hoid ned");
                 }
-            } else if(select == 2){
-                //read all persons
-            }
+            } else if(select == 3){ //select person from selected haushalt
+                if(verwaltung.personDao.getPersonsByHousehold(selectedHouseholdId).size() == 0){
+                    System.out.println("es sind keine personen in diesem haushalt");
+                } else{
 
+                    System.out.print("Liste mit Personen in " + selectedHouseholdName + ": ");
+                    printPersonsFromHousehold(verwaltung, selectedHouseholdId);   //method print persons in selected household()
+                    System.out.println();
+                    System.out.println("wählen sie eine Person mit der sie was machen möchteeeen:");
+                    select = sc.nextInt();
+
+                    selectedPersonId = selectPerson(verwaltung,select,selectedHouseholdId);  //choose person, get id
+                    System.out.println("Kontrollausgabe selected person id: " + selectedPersonId); //kontrollausgabe
+                }
+            }
+            else if (select == 4){ // create person & later get id by name after creation
+
+
+
+
+            }
 
 
 
         } while(cont);
 
+    }
 
+    public static void createPerson(Verwaltung verwaltung){
 
+        System.out.println("Vorname");
+        String FirstName = checkForValidPersonName();
+        System.out.println("Nachname");
+        String LastName = checkForValidPersonName();
+        System.out.println("Geschlecht (männlich/weiblich/divers)");
+        Gender gender = Gender.valueOf(checkForProgramTermination());
+        System.out.println("Geburtstag");
+        String BirthDay = checkForProgramTermination();
+        System.out.println("Straße");
+        String Street = checkForProgramTermination();
+        System.out.println("Nr");
+        String Nr = checkForProgramTermination();
+        System.out.println("Plz");
+        String Plz = checkForProgramTermination();
+        System.out.println("Stadt");
+        String City = checkForProgramTermination();
 
+      //  Person person = new Person(FirstName,LastName,gender,BirthDay,Street,Nr,Plz,City);
 
     }
+
+    // methode select person
+    public static int selectPerson(Verwaltung verwaltung , int select, int selectedHouseholdId){
+
+        int selectedPersonId = 0;
+        String selectedpersonName = "";
+
+        for (int i = 0; i < verwaltung.householdDao.getAllHouseholds().size(); i++) {
+            if (i == select-1){
+                selectedpersonName = verwaltung.personDao.getPersonsByHousehold(selectedHouseholdId).get(i).getFirstName();
+                System.out.println("ausgewählte person: " + selectedpersonName );
+                selectedPersonId = verwaltung.personDao.getPersonId(selectedpersonName);
+            }
+        }
+        return selectedPersonId;
+
+    }
+
+
+    public static void printPersonsFromHousehold(Verwaltung verwaltung, int selectedHouseholdId){
+
+        for (int i = 0; i < verwaltung.personDao.getPersonsByHousehold(selectedHouseholdId).size(); i++) {
+            Person p = verwaltung.personDao.getPersonsByHousehold(selectedHouseholdId).get(i);
+            System.out.print((i + 1) + ".) " + p.getFirstName() + " ");
+        }
+    }
+
 
     public static int selectedHousehold(Verwaltung verwaltung , int select){
 
