@@ -17,7 +17,7 @@ private PetDao petDao;
         Scanner sc = new Scanner(System.in);
         int select;
         boolean cont = true;
-
+//sdklnjklsadnklfasklöf
 
         do{ // do all
             int selectedHouseholdId = 0;
