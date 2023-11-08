@@ -4,61 +4,77 @@ import java.util.Scanner;
 
 public class Verwaltung {
 
-private PersonDao personDao;
-private HouseholdDaoImpl householdDao;
-private PetDao petDao;
+    private PersonDao personDao;
+    private HouseholdDaoImpl householdDao;
+    private PetDao petDao;
 
 
-
-    public void doAllStuff(Connection connection){
+    public void doAllStuff(Connection connection) {
 
         Verwaltung verwaltung = new Verwaltung(connection);
 
         Scanner sc = new Scanner(System.in);
         int select;
         boolean cont = true;
-//sdklnjklsadnklfasklöf
+        boolean contHouseheld = true;
+        boolean contPersonSection = true;
+        boolean contPetSection = true;
+        boolean contPetEditSection = true;
 
-        do{ // do all
+
+        do { // do all
+
+
             int selectedHouseholdId = 0;
             String selectedHouseholdName = "";
+
+
+            do {  //--------------------------------------------------------------------------- haushalt section
+                System.out.println("wählen sie:");
+                System.out.println("1.) Haushalt auswählen aus liste");
+                System.out.println("2.) Haushalt erstellen neue");
+                select = sc.nextInt();
+
+                if (select == 1) {  // GET HAUSHALT
+                    if (verwaltung.householdDao.getAllHouseholds().size() == 0) {
+                        System.out.println("nix haushalt innen diese");
+                    } else {
+
+                        System.out.print("Liste mit Haushalten: ");
+                        prindAllHousehold(verwaltung);
+                        System.out.println();
+                        System.out.println("wählen sie einen haushalt aus den sie verwenden möchteeeen:");
+                        select = sc.nextInt();
+                        selectedHouseholdId = selectedHousehold(verwaltung, select);  //choose haushalt, get id
+                        System.out.println(selectedHouseholdId); //kontrollausgabe
+
+                    }
+                } else if (select == 2) {    //ADD HAUSHALT
+                    System.out.println("Eingabe haushalt name des zu erstellenden haushaltes");
+                    sc.nextLine();
+                    String hNmae = sc.nextLine();
+                    Household newHousehold = new Household(hNmae);
+                    verwaltung.householdDao.addHousehold(newHousehold);  //neuer haushalt in datenbank eini
+                    selectedHouseholdId = verwaltung.householdDao.getHouseholdId(hNmae);  // get id from creates haushalt
+                    System.out.println(selectedHouseholdId);   //kontrollausgabe
+                }
+
+                System.out.println("wollen sie einen neuen haushalt erstellen oder mit dem erstellten/ausgewählten fortfahren?");
+                System.out.println("1.) fortfahren\n2.) noch einen Haushalt erstellen");
+                select = sc.nextInt();
+                if (select == 1) {
+                    contHouseheld = false;
+                }
+                sc.nextLine();
+            } while (contHouseheld);
+
+            selectedHouseholdName = verwaltung.householdDao.getHouseholdName(selectedHouseholdId);
+
 
             int selectedPersonId = 0;
             String selectedPersonName = "";
 
-            System.out.println("wählen sie:");
-            System.out.println("1.) Haushalt auswählen aus liste");
-            System.out.println("2.) Haushalt erstellen neue");
-            select = sc.nextInt();
-
-            if(select ==1){  // GET HAUSHALT
-                if(verwaltung.householdDao.getAllHouseholds().size() == 0){
-                    System.out.println("nix haushalt innen diese");
-                } else{
-
-                    System.out.print("Liste mit Haushalten: ");
-                    prindAllHousehold(verwaltung);
-                    System.out.println();
-                    System.out.println("wählen sie einen haushalt aus den sie verwenden möchteeeen:");
-                    select = sc.nextInt();
-                    selectedHouseholdId = selectedHousehold(verwaltung, select);  //choose haushalt, get id
-                    System.out.println(selectedHouseholdId); //kontrollausgabe
-
-                }
-            }
-
-            else if (select == 2){    //ADD HAUSHALT
-                System.out.println("Eingabe haushalt name des zu erstellenden haushaltes");
-                sc.nextLine();
-                String hNmae = sc.nextLine();
-                Household newHousehold = new Household(hNmae);
-                verwaltung.householdDao.addHousehold(newHousehold);  //neuer haushalt in datenbank eini
-                selectedHouseholdId = verwaltung.householdDao.getHouseholdId(hNmae);  // get id from creates haushalt
-                System.out.println(selectedHouseholdId);   //kontrollausgabe
-            }
-
-
-            selectedHouseholdName = verwaltung.householdDao.getHouseholdName(selectedHouseholdId);
+            do{
 
             System.out.println("was wollen sie mit diesem haushalt machen? " + selectedHouseholdName);
             System.out.println("1.) Haushalt update");
@@ -67,7 +83,7 @@ private PetDao petDao;
             System.out.println("4.) add Person to this haushalt");
             select = sc.nextInt();
 
-            if(select == 1){  //UPDATE HAUSHALD
+            if (select == 1) {  //UPDATE HAUSHALD
                 System.out.println("geben sie einen neuen namen für den haushalt ein:");
                 sc.nextLine();
                 String newName = sc.nextLine();
@@ -75,20 +91,20 @@ private PetDao petDao;
                 System.out.println("name wurde von " + selectedHouseholdName + " auf " + newName + " geändert");
                 selectedHouseholdName = newName;  //reassign haushaltname
 
-            } else if(select == 2){  // DELETE HAUSHALT
+            } else if (select == 2) {  // DELETE HAUSHALT
 
                 int areYouSure = areYouSure();  // abfrage oba si wiakli wiakli wiakli sicha is
 
-                if (areYouSure == 1){
+                if (areYouSure == 1) {
                     System.out.println(selectedHouseholdName + " wird nun aus der Datenbank gelöscht");
                     verwaltung.householdDao.deleteHousehold(selectedHouseholdId);     //löschen des haushaltes aus datenbank
-                } else{
+                } else {
                     System.out.println("daun hoid ned");
                 }
-            } else if(select == 3){ //select person from selected haushalt
-                if(verwaltung.personDao.getPersonsByHousehold(selectedHouseholdId).size() == 0){
+            } else if (select == 3) { //select person from selected haushalt
+                if (verwaltung.personDao.getPersonsByHousehold(selectedHouseholdId).size() == 0) {
                     System.out.println("es sind keine personen in diesem haushalt");
-                } else{
+                } else {
 
                     System.out.print("Liste mit Personen in " + selectedHouseholdName + ": ");
                     printPersonsFromHousehold(verwaltung, selectedHouseholdId);   //method print persons in selected household()
@@ -96,16 +112,31 @@ private PetDao petDao;
                     System.out.println("wählen sie eine Person mit der sie was machen möchteeeen:");
                     select = sc.nextInt();
 
-                    selectedPersonId = selectPerson(verwaltung,select,selectedHouseholdId);  //choose person, get id
+                    selectedPersonId = selectPerson(verwaltung, select, selectedHouseholdId);  //choose person, get id
                     System.out.println("Kontrollausgabe selected person id: " + selectedPersonId); //kontrollausgabe
                 }
-            }
-            else if (select == 4){ // create person & later get id by name after creation
+            } else if (select == 4) { // create person & later get id by name after creation
 
                 selectedPersonId = createPerson(verwaltung, selectedHouseholdId); //erstellen von person und rückagbe von person id
-
-
             }
+
+
+
+                System.out.println("wollen sie eine neue person erstellen oder mit der erstellten/ausgewählten fortfahren?");
+                System.out.println("1.) fortfahren\n2.) noch eine Person erstellen");
+                select = sc.nextInt();
+                if (select == 1) {
+                    contPersonSection = false;
+                }
+                sc.nextLine();
+        } while (contPersonSection);
+
+
+            int selectedPetId = 0;
+            String selectedPetName = "";
+
+          do{
+
             selectedPersonName = verwaltung.personDao.getPersonName(selectedPersonId);
 
             System.out.println("was wollen sie mit der Person " + selectedPersonName + " machen?");
@@ -115,71 +146,88 @@ private PetDao petDao;
             System.out.println("4.) Haustier zu Person hinzufügen");
             select = sc.nextInt();
 
-            int selectedPetId = 0;
-            String selectedPetName = "";
 
-            if (select == 1){
+
+            if (select == 1) {
                 System.out.println("sie haben person bearbeiten gewählt\ngeben sie die neuen informationen ein:");
-                updatePerson(verwaltung,selectedPersonId);
-            } else if (select == 2){
+                updatePerson(verwaltung, selectedPersonId);
+            } else if (select == 2) {
                 System.out.println("sie haben person löschen gewählt");
 
                 int areYouSure = areYouSure();  // abfrage oba si wiakli wiakli wiakli sicha is
 
-                if (areYouSure == 1){
+                if (areYouSure == 1) {
                     System.out.println(selectedPersonName + " wird nun aus der Datenbank gelöscht");
                     verwaltung.personDao.deletePerson(selectedPersonId);     //löschen des haushaltes aus datenbank
-                } else{
+                } else {
                     System.out.println("daun hoid ned");
                 }
-            } else if(select == 3){  //select pet from printed list
+            } else if (select == 3) {  //select pet from printed list
 
-                if(verwaltung.petDao.getAllPetsByPersonId(selectedPersonId).size() == 0){
+                if (verwaltung.petDao.getAllPetsByPersonId(selectedPersonId).size() == 0) {
                     System.out.println("es sind keine haustiere dieser person zugewiesen");
-                } else{
+                } else {
                     System.out.print("Liste mit Haustieren von " + selectedPersonName + ": ");
                     printPetsByPerson(verwaltung, selectedPersonId);
                     System.out.println("wählen sie ein haustier aus der liste");
                     select = sc.nextInt();
-                    selectedPetId = selectPet(verwaltung,select,selectedPersonId);
+                    selectedPetId = selectPet(verwaltung, select, selectedPersonId);
                     System.out.println("Kontrollausgabe selected pet id: " + selectedPetId); //kontrollausgabe
                 }
 
-            }else if (select == 4){ //add pet
-                    selectedPetId = createPet(verwaltung, selectedPersonId);
+            } else if (select == 4) { //add pet
+                selectedPetId = createPet(verwaltung, selectedPersonId);
             }
+
+              System.out.println("wollen sie eine neues Haustier erstellen oder mit der erstellten/ausgewählten fortfahren?");
+              System.out.println("1.) fortfahren\n2.) noch ein Haustier erstellen");
+              select = sc.nextInt();
+              if (select == 1) {
+                  contPetSection = false;
+              }
+              sc.nextLine();
+        } while(contPetSection);
+
+          do{
+
 
             System.out.println("was wollen sie mit dem Haustier " + selectedPetName + " machen?");
             System.out.println("1.) Haustier bearbeiten");
             System.out.println("2.) Haustier löschen");
             select = sc.nextInt();
 
-            if(select == 1){
+            if (select == 1) {
                 System.out.println("sie haben haustier bearbeiten gewählt\ngeben sie die neuen informationen ein:");
-                updatePet(verwaltung,selectedPetId);
-            } else if(select == 2){
+                updatePet(verwaltung, selectedPetId);
+            } else if (select == 2) {
 
                 System.out.println("sie haben haustier löschen gewählt");
 
                 int areYouSure = areYouSure();  // abfrage oba si wiakli wiakli wiakli sicha is
 
-                if (areYouSure == 1){
+                if (areYouSure == 1) {
                     System.out.println(selectedPetName + " wird nun aus der Datenbank gelöscht");
                     verwaltung.petDao.deletePet(selectedPetId);     //löschen des haushaltes aus datenbank
-                } else{
+                } else {
                     System.out.println("daun hoid ned");
                 }
 
             }
 
-
+              System.out.println("wollen sie ein weiteres haustier bearbeiten oder wieder zurück zum start (haushalt section)?");
+              System.out.println("1.) back to start (haushalt section)\n2.) noch ein Haustier erstellen");
+              select = sc.nextInt();
+              if (select == 1) {
+                  contPetEditSection = false;
+              }
+        } while (contPetEditSection);
 
             sc.nextLine();
-        } while(cont);
+        } while (cont);
 
     }
 
-    public static void updatePet(Verwaltung verwaltung, int selectedPetId){
+    public static void updatePet(Verwaltung verwaltung, int selectedPetId) {
         System.out.println("Haustier Name:");
         String name = checkForValidPersonName();
         System.out.println("Haustier Alter");
@@ -187,13 +235,13 @@ private PetDao petDao;
         System.out.println("Haustier Typ");
         String type = checkForValidPersonName();
 
-        Pet editedPet = new Pet(name,age,type);
-        verwaltung.petDao.updatePet(editedPet,selectedPetId);
+        Pet editedPet = new Pet(name, age, type);
+        verwaltung.petDao.updatePet(editedPet, selectedPetId);
 
         System.out.println("* bi bu bup pip - haustier wurde geändert *");
     }
 
-    public static int createPet(Verwaltung verwaltung, int selectedPersonId){
+    public static int createPet(Verwaltung verwaltung, int selectedPersonId) {
         System.out.println("Haustier Name:");
         String name = checkForValidPersonName();
         System.out.println("Haustier Alter");
@@ -201,7 +249,7 @@ private PetDao petDao;
         System.out.println("Haustier Typ");
         String type = checkForValidPersonName();
 
-        Pet newPet = new Pet(name,age,type);
+        Pet newPet = new Pet(name, age, type);
 
         verwaltung.petDao.addPet(newPet, selectedPersonId);  //neuer haushalt in datenbank eini
         int createdPetId = verwaltung.petDao.getPetId(name);  // get id from created person
@@ -211,29 +259,30 @@ private PetDao petDao;
     }
 
 
-    public static int selectPet(Verwaltung verwaltung, int select, int selectedPersonId){
+    public static int selectPet(Verwaltung verwaltung, int select, int selectedPersonId) {
         int selectedPetId = 0;
         String selectedPetName = "";
 
         for (int i = 0; i < verwaltung.petDao.getAllPetsByPersonId(selectedPersonId).size(); i++) {
-            if (i == select-1){
+            if (i == select - 1) {
                 selectedPetName = verwaltung.petDao.getAllPetsByPersonId(selectedPersonId).get(i).getName();
-                System.out.println("ausgewähltes haustier: " + selectedPetName );
+                System.out.println("ausgewähltes haustier: " + selectedPetName);
                 selectedPetId = verwaltung.petDao.getPetId(selectedPetName);
             }
         }
         return selectedPetId;
     }
 
-    public static void printPetsByPerson(Verwaltung verwaltung, int selectedPerson){
+    public static void printPetsByPerson(Verwaltung verwaltung, int selectedPerson) {
 
         for (int i = 0; i < verwaltung.petDao.getAllPetsByPersonId(selectedPerson).size(); i++) {
             Pet p = verwaltung.petDao.getAllPetsByPersonId(selectedPerson).get(i);
             System.out.print((i + 1) + ".) " + p.getName() + " ");
         }
+        System.out.println();
     }
 
-    public static int areYouSure(){
+    public static int areYouSure() {
         Scanner sc = new Scanner(System.in);
         int areYouSure = 0;
         System.out.println("sind sie sicher?");
@@ -255,7 +304,7 @@ private PetDao petDao;
         return areYouSure;
     }
 
-    public static void updatePerson(Verwaltung verwaltung, int personId){
+    public static void updatePerson(Verwaltung verwaltung, int personId) {
         System.out.println("neuer Vorname");
         String firstName = checkForValidPersonName();
         System.out.println("neuer Nachname");
@@ -273,14 +322,14 @@ private PetDao petDao;
         System.out.println("Stadt");
         String city = checkForProgramTermination();
 
-        Adress editedAdress = new Adress(street,nr,plz,city);
-        Person editedPerson = new Person(firstName,lastName,gender,birthDay,editedAdress);
+        Adress editedAdress = new Adress(street, nr, plz, city);
+        Person editedPerson = new Person(firstName, lastName, gender, birthDay, editedAdress);
         verwaltung.personDao.updatePerson(editedPerson, personId);      // update id?
 
         System.out.println("* bi bu bup pip - person wurde geändert *");
     }
 
-    public static int createPerson(Verwaltung verwaltung, int selectedHouseholdId){
+    public static int createPerson(Verwaltung verwaltung, int selectedHouseholdId) {
 
         int createdPersonId = 0;
 
@@ -301,8 +350,8 @@ private PetDao petDao;
         System.out.println("Stadt");
         String city = checkForProgramTermination();
 
-        Adress newAdress = new Adress(street,nr,plz,city);
-        Person newPerson = new Person(firstName,lastName,gender,birthDay,newAdress);
+        Adress newAdress = new Adress(street, nr, plz, city);
+        Person newPerson = new Person(firstName, lastName, gender, birthDay, newAdress);
 
         verwaltung.personDao.addPerson(newPerson, selectedHouseholdId);  //neuer haushalt in datenbank eini
         createdPersonId = verwaltung.personDao.getPersonId(firstName);  // get id from created person
@@ -313,15 +362,15 @@ private PetDao petDao;
     }
 
     // methode select person
-    public static int selectPerson(Verwaltung verwaltung , int select, int selectedHouseholdId){
+    public static int selectPerson(Verwaltung verwaltung, int select, int selectedHouseholdId) {
 
         int selectedPersonId = 0;
         String selectedpersonName = "";
 
         for (int i = 0; i < verwaltung.householdDao.getAllHouseholds().size(); i++) {
-            if (i == select-1){
+            if (i == select - 1) {
                 selectedpersonName = verwaltung.personDao.getPersonsByHousehold(selectedHouseholdId).get(i).getFirstName();
-                System.out.println("ausgewählte person: " + selectedpersonName );
+                System.out.println("ausgewählte person: " + selectedpersonName);
                 selectedPersonId = verwaltung.personDao.getPersonId(selectedpersonName);
             }
         }
@@ -330,7 +379,7 @@ private PetDao petDao;
     }
 
 
-    public static void printPersonsFromHousehold(Verwaltung verwaltung, int selectedHouseholdId){
+    public static void printPersonsFromHousehold(Verwaltung verwaltung, int selectedHouseholdId) {
 
         for (int i = 0; i < verwaltung.personDao.getPersonsByHousehold(selectedHouseholdId).size(); i++) {
             Person p = verwaltung.personDao.getPersonsByHousehold(selectedHouseholdId).get(i);
@@ -339,22 +388,22 @@ private PetDao petDao;
     }
 
 
-    public static int selectedHousehold(Verwaltung verwaltung , int select){
+    public static int selectedHousehold(Verwaltung verwaltung, int select) {
 
         int selectedHouseholdId = 0;
         String selectedHouseholdName = "";
 
         for (int i = 0; i < verwaltung.householdDao.getAllHouseholds().size(); i++) {
-            if (i == select-1){
+            if (i == select - 1) {
                 selectedHouseholdName = verwaltung.householdDao.getAllHouseholds().get(i).getName();
-                System.out.println("ausgewählter haushalt: " + selectedHouseholdName );
+                System.out.println("ausgewählter haushalt: " + selectedHouseholdName);
                 selectedHouseholdId = verwaltung.householdDao.getHouseholdId(selectedHouseholdName);
             }
         }
         return selectedHouseholdId;
     }
 
-    public static void prindAllHousehold(Verwaltung verwaltung){
+    public static void prindAllHousehold(Verwaltung verwaltung) {
 
         for (int i = 0; i < verwaltung.householdDao.getAllHouseholds().size(); i++) {
             Household p = verwaltung.householdDao.getAllHouseholds().get(i);
@@ -376,160 +425,157 @@ private PetDao petDao;
 
     //string to string methode zum ausdrucken der liste
 
-    public ArrayList<Household> directorsList = new ArrayList<>();
+//    public ArrayList<Household> directorsList = new ArrayList<>();
 
-    public void oldStuff() {
+//    public void oldStuff() {
+//
+//        Household cb = new Household("CB");
+//        Household linz = new Household("Linz");
+//        Household avengers = new Household("Avengers");
+//
+//        Household current = null;
+//
+//        Scanner sc = new Scanner(System.in);
+//        int select;
+//        boolean cont = true;
+//
+//        System.out.println("Herzlich willkommen zur Haushaltsverwaltung");
+//
+//        do {
+//
+//
+//            System.out.println("Wöhlen Sie eine Personenverwaltung aus: \n1.) Coders Bay \n2.) Linz \n3.) Avengers");
+//            System.out.println(":q! Programm beenden");
+//            //select = sc.nextInt();
+//
+//    /*
+//            String input = sc.nextLine(); // Lies die Eingabe als Zeichenkette
+//
+//            if (":q!".equals(input)) {
+//                // Wirf die Ausnahme, um das Programm zu beenden
+//                throw new RuntimeException("Programm wird beendet.");
+//            }
+//*/
+//            //select = Integer.parseInt(input); // Konvertiere die Eingabe in eine Zahl
+//
+//            select = Integer.parseInt(checkForProgramTermination());
+//
+//
+//            if (select == 1) {
+//                current = cb;
+//            } else if (select == 2) {
+//                current = linz;
+//            } else if (select == 3) {
+//                current = avengers;
+//            } else {
+//                System.out.println("Tschüss.");
+//                System.exit(0);
+//            }
+//
+//
+//            System.out.println("1.) Person anlegen \n2.) Person löschen\n3.) Person suchen");
+//            select = Integer.parseInt(checkForProgramTermination());
+//
+//            if (select == 1) {
+//                System.out.println("Welches Informationspaket wollen Sie für die Person anlegen?");
+//                System.out.println("1.) Simple - Vorname / Nachname");
+//                System.out.println("2.) Advanced - Vorname / Nachname / Geschlecht / Geburtstag");
+//                System.out.println("3.) Premium - Vorname / Nachname / Geschlecht / Geburtstag / Straße / Nr / Plz / Stadt");
+//                select = Integer.parseInt(checkForProgramTermination());
+//                //sc.nextLine();
+//
+//                if (select == 1) {
+//                    System.out.println("Vorname");
+//                    //checkForProgramTermination(input);   //neu zuweisen scanner
+//                    String FirstName = checkForValidPersonName();
+//                    System.out.println("Nachname");
+//                    //checkForProgramTermination(input);
+//                    String LastName = checkForValidPersonName();
+//
+//                    //      current.createSimplePerson(FirstName, LastName);
+//                } else if (select == 2) {
+//                    System.out.println("Vorname");
+//                    String FirstName = checkForValidPersonName();
+//                    System.out.println("Nachname");
+//                    String LastName = checkForValidPersonName();
+//                    System.out.println("Geschlecht (männlich/weiblich/divers)");
+//                    Gender gender = Gender.valueOf(checkForProgramTermination());
+//                    System.out.println("Geburtstag");
+//                    String BirthDay = checkForProgramTermination();
+//
+//                    //         current.createHigherPerson(FirstName, LastName, gender, BirthDay);
+//                } else if (select == 3) {
+//                    System.out.println("Vorname");
+//                    String FirstName = checkForValidPersonName();
+//                    System.out.println("Nachname");
+//                    String LastName = checkForValidPersonName();
+//                    System.out.println("Geschlecht (männlich/weiblich/divers)");
+//                    Gender gender = Gender.valueOf(checkForProgramTermination());
+//                    System.out.println("Geburtstag");
+//                    String BirthDay = checkForProgramTermination();
+//                    System.out.println("Straße");
+//                    String Street = checkForProgramTermination();
+//                    System.out.println("Nr");
+//                    String Nr = checkForProgramTermination();
+//                    System.out.println("Plz");
+//                    String Plz = checkForProgramTermination();
+//                    System.out.println("Stadt");
+//                    String City = checkForProgramTermination();
+//
+//                    //       current.createFullPerson(FirstName, LastName, gender, BirthDay, Street, Nr, Plz, City);
+//
+//                }
+//
+//                //ArrayList<Person> list = current.getPv();
+//                //for (Person person : list) {
+//                //    System.out.println(person.getFirstName());
+//                //}
+//
+//                for (Person person : current.getPv()) {
+//                    System.out.println(person.getFirstName());
+//                }
+//
+//            } // Auswahl anlegen
+//
+//            else if (select == 2) {
+//                System.out.println("Sie haben löschen ausgewählt");
+//
+//                for (int i = 0; i < current.getPv().size(); i++) {
+//                    System.out.println(i + ".) " + current.getPv().get(i).getFirstName());
+//                }
+//
+//                System.out.println("Welche Person möchten Sie löschen?");
+//                select = sc.nextInt();
+//
+//                current.getPv().remove(select);
+//
+//            } else if (select == 3) {
+//                System.out.println("Welche Person möchten Sie suchen?");
+//                containsPerson(current);
+//
+//            }
+//
+//        } while (cont); //main total
+//
+//    }
 
-        Household cb = new Household("CB");
-        Household linz = new Household("Linz");
-        Household avengers = new Household("Avengers");
+//    public void createHouseheld(String name) {
+//
+//        directorsList.add(new Household(name));
+//    }
 
-        Household current = null;
+//    public String toString() {
+//
+//
+//        String result = "";
+//
+//        for (Household pv : directorsList) {
+//            result += pv.toString();
+//        }
+//        return result;
+//    }
 
-        Scanner sc = new Scanner(System.in);
-        int select;
-        boolean cont = true;
-
-        System.out.println("Herzlich willkommen zur Haushaltsverwaltung");
-
-        do {
-
-
-            System.out.println("Wöhlen Sie eine Personenverwaltung aus: \n1.) Coders Bay \n2.) Linz \n3.) Avengers");
-            System.out.println(":q! Programm beenden");
-            //select = sc.nextInt();
-
-    /*
-            String input = sc.nextLine(); // Lies die Eingabe als Zeichenkette
-
-            if (":q!".equals(input)) {
-                // Wirf die Ausnahme, um das Programm zu beenden
-                throw new RuntimeException("Programm wird beendet.");
-            }
-*/
-            //select = Integer.parseInt(input); // Konvertiere die Eingabe in eine Zahl
-
-            select = Integer.parseInt(checkForProgramTermination());
-
-
-            if (select == 1) {
-                current = cb;
-            } else if (select == 2) {
-                current = linz;
-            } else if (select == 3)  {
-                current = avengers;
-            } else  {
-                System.out.println("Tschüss.");
-                System.exit(0);
-            }
-
-
-
-            System.out.println("1.) Person anlegen \n2.) Person löschen\n3.) Person suchen");
-            select = Integer.parseInt(checkForProgramTermination());
-
-            if (select == 1) {
-                System.out.println("Welches Informationspaket wollen Sie für die Person anlegen?");
-                System.out.println("1.) Simple - Vorname / Nachname");
-                System.out.println("2.) Advanced - Vorname / Nachname / Geschlecht / Geburtstag");
-                System.out.println("3.) Premium - Vorname / Nachname / Geschlecht / Geburtstag / Straße / Nr / Plz / Stadt");
-                select = Integer.parseInt(checkForProgramTermination());
-                //sc.nextLine();
-
-                if (select == 1) {
-                    System.out.println("Vorname");
-                    //checkForProgramTermination(input);   //neu zuweisen scanner
-                    String FirstName = checkForValidPersonName();
-                    System.out.println("Nachname");
-                    //checkForProgramTermination(input);
-                    String LastName = checkForValidPersonName();
-
-              //      current.createSimplePerson(FirstName, LastName);
-                } else if (select == 2) {
-                    System.out.println("Vorname");
-                    String FirstName = checkForValidPersonName();
-                    System.out.println("Nachname");
-                    String LastName = checkForValidPersonName();
-                    System.out.println("Geschlecht (männlich/weiblich/divers)");
-                    Gender gender = Gender.valueOf(checkForProgramTermination());
-                    System.out.println("Geburtstag");
-                    String BirthDay = checkForProgramTermination();
-
-           //         current.createHigherPerson(FirstName, LastName, gender, BirthDay);
-                } else if (select == 3) {
-                    System.out.println("Vorname");
-                    String FirstName = checkForValidPersonName();
-                    System.out.println("Nachname");
-                    String LastName = checkForValidPersonName();
-                    System.out.println("Geschlecht (männlich/weiblich/divers)");
-                    Gender gender = Gender.valueOf(checkForProgramTermination());
-                    System.out.println("Geburtstag");
-                    String BirthDay = checkForProgramTermination();
-                    System.out.println("Straße");
-                    String Street = checkForProgramTermination();
-                    System.out.println("Nr");
-                    String Nr = checkForProgramTermination();
-                    System.out.println("Plz");
-                    String Plz = checkForProgramTermination();
-                    System.out.println("Stadt");
-                    String City = checkForProgramTermination();
-
-             //       current.createFullPerson(FirstName, LastName, gender, BirthDay, Street, Nr, Plz, City);
-
-                }
-
-                //ArrayList<Person> list = current.getPv();
-                //for (Person person : list) {
-                //    System.out.println(person.getFirstName());
-                //}
-
-                for (Person person : current.getPv()) {
-                    System.out.println(person.getFirstName());
-                }
-
-            } // Auswahl anlegen
-
-            else if (select == 2){
-                System.out.println("Sie haben löschen ausgewählt");
-
-                for (int i = 0; i < current.getPv().size(); i++) {
-                    System.out.println(i + ".) " + current.getPv().get(i).getFirstName());
-                }
-
-                System.out.println("Welche Person möchten Sie löschen?");
-                select = sc.nextInt();
-
-                current.getPv().remove(select);
-
-            }
-
-            else if (select == 3){
-                System.out.println("Welche Person möchten Sie suchen?");
-                containsPerson(current);
-
-            }
-
-        } while (cont); //main total
-
-    }
-
-    public void createHouseheld(String name) {
-
-        directorsList.add(new Household(name));
-    }
-
-    public String toString() {
-
-
-        String result = "";
-
-        for (Household pv : directorsList) {
-            result += pv.toString();
-        }
-        return result;
-    }
-
-    public static void containsPerson(Household toSearch){
+    public static void containsPerson(Household toSearch) {
 
         String searchName = checkForValidPersonName();
         boolean nameFound = false;
@@ -542,19 +588,18 @@ private PetDao petDao;
                 firstName = toSearch.getPv().get(i).getFirstName();
                 lastName = toSearch.getPv().get(i).getLastName();
 
-                 if ((searchName.equals(firstName)) || (searchName.equals(lastName)))
-                 {
-                     nameFound = true;
-                 }
+                if ((searchName.equals(firstName)) || (searchName.equals(lastName))) {
+                    nameFound = true;
+                }
             }
-            if (nameFound){
+            if (nameFound) {
                 System.out.println("Name wurde gefunden");
             } else {
 
-                    throw new NullPointerException();
+                throw new NullPointerException();
 
             }
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             System.out.println("NullPointException - Person wurde nicht gefunden.");
         }
 
@@ -562,7 +607,7 @@ private PetDao petDao;
     }
 
     public static String checkForProgramTermination() {
-      Scanner sc = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
         String input = sc.nextLine();
 
         try {
@@ -580,9 +625,9 @@ private PetDao petDao;
 
 
     public static String checkForValidPersonName() {
-       Boolean stay = true;
-       String name = "";
-       // Scanner nameScanner = new Scanner(System.in);
+        Boolean stay = true;
+        String name = "";
+        // Scanner nameScanner = new Scanner(System.in);
 
         while (stay) {
             try {
@@ -606,11 +651,11 @@ private PetDao petDao;
         return name;
     }
 
-    public void createFullPerson (String firstName, String lastName, Gender gender, String birthDay,String street, String nr, String plz, String city ) {
+    public void createFullPerson(String firstName, String lastName, Gender gender, String birthDay, String street, String nr, String plz, String city) {
 
-        Adress adress = new Adress(street,nr,plz,city);
+        Adress adress = new Adress(street, nr, plz, city);
 
-       // pv.add(new Person(firstName, lastName, gender, birthDay,adress));
+        // pv.add(new Person(firstName, lastName, gender, birthDay,adress));
     }
 
 
