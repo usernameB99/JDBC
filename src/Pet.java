@@ -1,7 +1,7 @@
 public class Pet {
 
     private String name;
-    private int age;
+    private String age;
     private String type;
     private int person_id;
 
@@ -21,11 +21,11 @@ public class Pet {
         this.name = name;
     }
 
-    public int getAge() {
+    public String getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(String age) {
         this.age = age;
     }
 
@@ -37,10 +37,10 @@ public class Pet {
         this.type = animalType;
     }
 
-    public Pet(String name, int age, String animalType, int personID) {
+    public Pet(String name, String age, String animalType) {
         this.name = name;
         this.age = age;
         this.type = animalType;
-        this.person_id = personID;
+        //this.person_id = personID;
     }
 }

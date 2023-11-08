@@ -9,21 +9,16 @@ public class PetDaoImpl implements PetDao{
         this.connection = connection;
     }
 
-    public void addPet(Pet pet) {
+    public void addPet(Pet pet, int selectedPersonId) {
         String query = "INSERT INTO pets (name, age, type, person_id) VALUES (?, ?, ?, ?)";                                             //person_id
 
-        try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, pet.getName());
-            statement.setInt(2, pet.getAge());
+            statement.setString(2, pet.getAge());
             statement.setString(3, pet.getAnimalType());
-            statement.setInt(2, pet.getId());                                                                             // added person id
+            statement.setInt(4, selectedPersonId);
             statement.executeUpdate();
 
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                int generatedId = generatedKeys.getInt(1);
-                pet.setId(generatedId); // Setze die automatisch generierte ID in der Pet-Instanz
-            }
         } catch (SQLException e) {
             e.printStackTrace();
             // Hier sollte die Fehlerbehandlung erfolgen
@@ -38,10 +33,10 @@ public class PetDaoImpl implements PetDao{
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 String name = resultSet.getString("name");
-                int age = resultSet.getInt("age");
+                String age = resultSet.getString("age");
                 String animalType = resultSet.getString("type");
-                int id = resultSet.getInt("person_id");                                                                                 //added id
-                Pet pet = new Pet(name, age, animalType, id);
+                //int id = resultSet.getInt("person_id");                                                                                 //added id
+                Pet pet = new Pet(name, age, animalType);
                 pets.add(pet);
             }
         } catch (SQLException e) {
@@ -53,16 +48,14 @@ public class PetDaoImpl implements PetDao{
     }
 
 
-    public void updatePet(Pet pet) {
+    public void updatePet(Pet pet, int selectedPetId) {
         String query = "UPDATE pets SET name = ?, age = ?, type = ? WHERE pet_id = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, pet.getName());
-            statement.setInt(2, pet.getAge());
+            statement.setString(2, pet.getAge());
             statement.setString(3, pet.getAnimalType());
-            // Annahme: Die ID wird benötigt, um das spezifische Haustier zu identifizieren
-            // Hier solltest du die entsprechende ID des Haustiers setzen                                                                       // pet id aus datenbank?
-            statement.setInt(4, pet.getId()); // Annahme: Du hast ein Attribut id in der Pet-Klasse                                 // TODO - von wo bekomme ich pet_id?
+            statement.setInt(4, selectedPetId);
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -82,27 +75,71 @@ public class PetDaoImpl implements PetDao{
         }
     }
 
-    public Pet getPetByPersonId(int personId) {
+//    public Pet getPetByPersonId(int personId) {
+//        String query = "SELECT * FROM pets WHERE person_id = ?";
+//        Pet pet = null;
+//
+//        try (PreparedStatement statement = connection.prepareStatement(query)) {
+//            statement.setInt(1, personId);
+//            ResultSet resultSet = statement.executeQuery();
+//            if (resultSet.next()) {
+//                String name = resultSet.getString("name");
+//                int age = resultSet.getInt("age");
+//                String animalType = resultSet.getString("type");
+//                //int id = resultSet.getInt("person_id");                                                                                 //added person_id
+//
+//                pet = new Pet(name, age, animalType);
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            // Hier sollte die Fehlerbehandlung erfolgen
+//        }
+//
+//        return pet;
+//    }
+
+    public ArrayList<Pet> getAllPetsByPersonId(int personId) {
+        ArrayList<Pet> pets = new ArrayList<>();
         String query = "SELECT * FROM pets WHERE person_id = ?";
-        Pet pet = null;
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, personId);
             ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                String name = resultSet.getString("name");
-                int age = resultSet.getInt("age");
-                String animalType = resultSet.getString("type");
-                int id = resultSet.getInt("person_id");                                                                                 //added person_id
 
-                pet = new Pet(name, age, animalType, id);
+            while (resultSet.next()) {
+                String name = resultSet.getString("name");
+                String age = resultSet.getString("age");
+                String type = resultSet.getString("type");
+
+                Pet pet = new Pet(name, age, type);
+                pets.add(pet);
             }
         } catch (SQLException e) {
             e.printStackTrace();
             // Hier sollte die Fehlerbehandlung erfolgen
         }
+        return pets;
+    }
 
-        return pet;
+
+    public int getPetId(String name){
+
+        String query = "SELECT pet_id FROM pets WHERE name = ?";
+
+        int petId = 0;
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, name);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                petId = resultSet.getInt("pet_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return petId;
     }
 
 }

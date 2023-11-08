@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface PersonDao {
 
-    public void addPerson(Person person);
+    public void addPerson(Person person, int selectedHouseholdId);
 
     public List<Person> getAllPersons();
 
     // Weitere Methoden für Update, Delete, etc. können hinzugefügt werden
 
-    public void updatePerson(Person person);
+    public void updatePerson(Person person, int personId);
 
     // Methode zum Löschen einer Person aus der Datenbank
     public void deletePerson(int personId);

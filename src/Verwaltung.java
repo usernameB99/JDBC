@@ -19,7 +19,7 @@ private PetDao petDao;
         boolean cont = true;
 
 
-        do{
+        do{ // do all
             int selectedHouseholdId = 0;
             String selectedHouseholdName = "";
 
@@ -57,6 +57,7 @@ private PetDao petDao;
                 System.out.println(selectedHouseholdId);   //kontrollausgabe
             }
 
+
             selectedHouseholdName = verwaltung.householdDao.getHouseholdName(selectedHouseholdId);
 
             System.out.println("was wollen sie mit diesem haushalt machen? " + selectedHouseholdName);
@@ -68,25 +69,16 @@ private PetDao petDao;
 
             if(select == 1){  //UPDATE HAUSHALD
                 System.out.println("geben sie einen neuen namen für den haushalt ein:");
+                sc.nextLine();
                 String newName = sc.nextLine();
                 verwaltung.householdDao.updateHousehold(selectedHouseholdId, newName);
                 System.out.println("name wurde von " + selectedHouseholdName + " auf " + newName + " geändert");
                 selectedHouseholdName = newName;  //reassign haushaltname
 
             } else if(select == 2){  // DELETE HAUSHALT
-                int areYouSure = 0;
-                System.out.println("sie haben haushalt löschen gewählt\n san sa si do wiakli sicha?");
-                System.out.println("1.) yes \n2.)no");
-                areYouSure = sc.nextInt();
-                System.out.println("sind sie sich wirklich sicher?");
-                System.out.println("1.) yes \n2.)no");
-                areYouSure = sc.nextInt();
-                System.out.println("sind sie sich wirklich wirklich sicher?");
-                System.out.println("1.) joooo \n2.)no");
-                areYouSure = sc.nextInt();
-                System.out.println("sind sie sich wirklich wirklich wirklich sicher?");
-                System.out.println("1.) lösch den schas jetzt herrst du wappla \n2.)no");
-                areYouSure = sc.nextInt();
+
+                int areYouSure = areYouSure();  // abfrage oba si wiakli wiakli wiakli sicha is
+
                 if (areYouSure == 1){
                     System.out.println(selectedHouseholdName + " wird nun aus der Datenbank gelöscht");
                     verwaltung.householdDao.deleteHousehold(selectedHouseholdId);     //löschen des haushaltes aus datenbank
@@ -110,38 +102,214 @@ private PetDao petDao;
             }
             else if (select == 4){ // create person & later get id by name after creation
 
+                selectedPersonId = createPerson(verwaltung, selectedHouseholdId); //erstellen von person und rückagbe von person id
 
 
+            }
+            selectedPersonName = verwaltung.personDao.getPersonName(selectedPersonId);
+
+            System.out.println("was wollen sie mit der Person " + selectedPersonName + " machen?");
+            System.out.println("1.) Person bearbeiten");
+            System.out.println("2.) Person löschen");
+            System.out.println("3.) Haustiere der Person anzeigen");
+            System.out.println("4.) Haustier zu Person hinzufügen");
+            select = sc.nextInt();
+
+            int selectedPetId = 0;
+            String selectedPetName = "";
+
+            if (select == 1){
+                System.out.println("sie haben person bearbeiten gewählt\ngeben sie die neuen informationen ein:");
+                updatePerson(verwaltung,selectedPersonId);
+            } else if (select == 2){
+                System.out.println("sie haben person löschen gewählt");
+
+                int areYouSure = areYouSure();  // abfrage oba si wiakli wiakli wiakli sicha is
+
+                if (areYouSure == 1){
+                    System.out.println(selectedPersonName + " wird nun aus der Datenbank gelöscht");
+                    verwaltung.personDao.deletePerson(selectedPersonId);     //löschen des haushaltes aus datenbank
+                } else{
+                    System.out.println("daun hoid ned");
+                }
+            } else if(select == 3){  //select pet from printed list
+
+                if(verwaltung.petDao.getAllPetsByPersonId(selectedPersonId).size() == 0){
+                    System.out.println("es sind keine haustiere dieser person zugewiesen");
+                } else{
+                    System.out.print("Liste mit Haustieren von " + selectedPersonName + ": ");
+                    printPetsByPerson(verwaltung, selectedPersonId);
+                    System.out.println("wählen sie ein haustier aus der liste");
+                    select = sc.nextInt();
+                    selectedPetId = selectPet(verwaltung,select,selectedPersonId);
+                    System.out.println("Kontrollausgabe selected pet id: " + selectedPetId); //kontrollausgabe
+                }
+
+            }else if (select == 4){ //add pet
+                    selectedPetId = createPet(verwaltung, selectedPersonId);
+            }
+
+            System.out.println("was wollen sie mit dem Haustier " + selectedPetName + " machen?");
+            System.out.println("1.) Haustier bearbeiten");
+            System.out.println("2.) Haustier löschen");
+            select = sc.nextInt();
+
+            if(select == 1){
+                System.out.println("sie haben haustier bearbeiten gewählt\ngeben sie die neuen informationen ein:");
+                updatePet(verwaltung,selectedPetId);
+            } else if(select == 2){
+
+                System.out.println("sie haben haustier löschen gewählt");
+
+                int areYouSure = areYouSure();  // abfrage oba si wiakli wiakli wiakli sicha is
+
+                if (areYouSure == 1){
+                    System.out.println(selectedPetName + " wird nun aus der Datenbank gelöscht");
+                    verwaltung.petDao.deletePet(selectedPetId);     //löschen des haushaltes aus datenbank
+                } else{
+                    System.out.println("daun hoid ned");
+                }
 
             }
 
 
 
+            sc.nextLine();
         } while(cont);
 
     }
 
-    public static void createPerson(Verwaltung verwaltung){
+    public static void updatePet(Verwaltung verwaltung, int selectedPetId){
+        System.out.println("Haustier Name:");
+        String name = checkForValidPersonName();
+        System.out.println("Haustier Alter");
+        String age = checkForProgramTermination();
+        System.out.println("Haustier Typ");
+        String type = checkForValidPersonName();
 
-        System.out.println("Vorname");
-        String FirstName = checkForValidPersonName();
-        System.out.println("Nachname");
-        String LastName = checkForValidPersonName();
+        Pet editedPet = new Pet(name,age,type);
+        verwaltung.petDao.updatePet(editedPet,selectedPetId);
+
+        System.out.println("* bi bu bup pip - haustier wurde geändert *");
+    }
+
+    public static int createPet(Verwaltung verwaltung, int selectedPersonId){
+        System.out.println("Haustier Name:");
+        String name = checkForValidPersonName();
+        System.out.println("Haustier Alter");
+        String age = checkForProgramTermination();
+        System.out.println("Haustier Typ");
+        String type = checkForValidPersonName();
+
+        Pet newPet = new Pet(name,age,type);
+
+        verwaltung.petDao.addPet(newPet, selectedPersonId);  //neuer haushalt in datenbank eini
+        int createdPetId = verwaltung.petDao.getPetId(name);  // get id from created person
+
+        System.out.println("* bi bu bup pip - haustier " + name + " wurde erstellt *");
+        return createdPetId;
+    }
+
+
+    public static int selectPet(Verwaltung verwaltung, int select, int selectedPersonId){
+        int selectedPetId = 0;
+        String selectedPetName = "";
+
+        for (int i = 0; i < verwaltung.petDao.getAllPetsByPersonId(selectedPersonId).size(); i++) {
+            if (i == select-1){
+                selectedPetName = verwaltung.petDao.getAllPetsByPersonId(selectedPersonId).get(i).getName();
+                System.out.println("ausgewähltes haustier: " + selectedPetName );
+                selectedPetId = verwaltung.petDao.getPetId(selectedPetName);
+            }
+        }
+        return selectedPetId;
+    }
+
+    public static void printPetsByPerson(Verwaltung verwaltung, int selectedPerson){
+
+        for (int i = 0; i < verwaltung.petDao.getAllPetsByPersonId(selectedPerson).size(); i++) {
+            Pet p = verwaltung.petDao.getAllPetsByPersonId(selectedPerson).get(i);
+            System.out.print((i + 1) + ".) " + p.getName() + " ");
+        }
+    }
+
+    public static int areYouSure(){
+        Scanner sc = new Scanner(System.in);
+        int areYouSure = 0;
+        System.out.println("sind sie sicher?");
+        System.out.println("1.) yes \n2.)no");
+        areYouSure = sc.nextInt();
+        System.out.println("san sa si do wiakli sicha?");
+        System.out.println("1.) yes \n2.)no");
+        areYouSure = sc.nextInt();
+        System.out.println("sind sie sich da wirklich sicher?");
+        System.out.println("1.) yes \n2.)no");
+        areYouSure = sc.nextInt();
+        System.out.println("sind sie sich da wirklich wirklich sicher?");
+        System.out.println("1.) joooo \n2.)no");
+        areYouSure = sc.nextInt();
+        System.out.println("sind sie sich da wirklich wirklich wirklich wiiiiirklich sicher?");
+        System.out.println("1.) lösch den schas jetzt herrst du wappla \n2.)no");
+        areYouSure = sc.nextInt();
+
+        return areYouSure;
+    }
+
+    public static void updatePerson(Verwaltung verwaltung, int personId){
+        System.out.println("neuer Vorname");
+        String firstName = checkForValidPersonName();
+        System.out.println("neuer Nachname");
+        String lastName = checkForValidPersonName();
         System.out.println("Geschlecht (männlich/weiblich/divers)");
         Gender gender = Gender.valueOf(checkForProgramTermination());
         System.out.println("Geburtstag");
-        String BirthDay = checkForProgramTermination();
+        String birthDay = checkForProgramTermination();
         System.out.println("Straße");
-        String Street = checkForProgramTermination();
+        String street = checkForProgramTermination();
         System.out.println("Nr");
-        String Nr = checkForProgramTermination();
+        String nr = checkForProgramTermination();
         System.out.println("Plz");
-        String Plz = checkForProgramTermination();
+        String plz = checkForProgramTermination();
         System.out.println("Stadt");
-        String City = checkForProgramTermination();
+        String city = checkForProgramTermination();
 
-      //  Person person = new Person(FirstName,LastName,gender,BirthDay,Street,Nr,Plz,City);
+        Adress editedAdress = new Adress(street,nr,plz,city);
+        Person editedPerson = new Person(firstName,lastName,gender,birthDay,editedAdress);
+        verwaltung.personDao.updatePerson(editedPerson, personId);      // update id?
 
+        System.out.println("* bi bu bup pip - person wurde geändert *");
+    }
+
+    public static int createPerson(Verwaltung verwaltung, int selectedHouseholdId){
+
+        int createdPersonId = 0;
+
+        System.out.println("Vorname");
+        String firstName = checkForValidPersonName();
+        System.out.println("Nachname");
+        String lastName = checkForValidPersonName();
+        System.out.println("Geschlecht (männlich/weiblich/divers)");
+        Gender gender = Gender.valueOf(checkForProgramTermination());
+        System.out.println("Geburtstag");
+        String birthDay = checkForProgramTermination();
+        System.out.println("Straße");
+        String street = checkForProgramTermination();
+        System.out.println("Nr");
+        String nr = checkForProgramTermination();
+        System.out.println("Plz");
+        String plz = checkForProgramTermination();
+        System.out.println("Stadt");
+        String city = checkForProgramTermination();
+
+        Adress newAdress = new Adress(street,nr,plz,city);
+        Person newPerson = new Person(firstName,lastName,gender,birthDay,newAdress);
+
+        verwaltung.personDao.addPerson(newPerson, selectedHouseholdId);  //neuer haushalt in datenbank eini
+        createdPersonId = verwaltung.personDao.getPersonId(firstName);  // get id from created person
+
+        System.out.println("* bi bu bup pip - person " + firstName + " wurde erstellt *");
+
+        return createdPersonId;
     }
 
     // methode select person
@@ -438,6 +606,12 @@ private PetDao petDao;
         return name;
     }
 
+    public void createFullPerson (String firstName, String lastName, Gender gender, String birthDay,String street, String nr, String plz, String city ) {
+
+        Adress adress = new Adress(street,nr,plz,city);
+
+       // pv.add(new Person(firstName, lastName, gender, birthDay,adress));
+    }
 
 
 }

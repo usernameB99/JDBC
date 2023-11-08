@@ -12,8 +12,8 @@ public class PersonDaoImpl implements PersonDao{
         this.connection = connection;
     }
 
-    public void addPerson(Person person) {
-        String query = "INSERT INTO persons (firstname, lastname, gender, birthday, address) VALUES (?, ?, ?, ?, ?)";                                //household id
+    public void addPerson(Person person, int selectedHouseholdId) {
+        String query = "INSERT INTO persons (firstname, lastname, gender, birthday, address, household_id) VALUES (?, ?, ?, ?, ?, ?)";                                //household id
 
         String fullAddress = person.getAdress().getFullAddress(); // Hier wird die vollständige Adresse als String abgerufen
 
@@ -23,6 +23,7 @@ public class PersonDaoImpl implements PersonDao{
             statement.setString(3, person.getGender().toString()); // Wenn das Gender-Objekt in einen String umgewandelt werden kann
             statement.setString(4, person.getBirthDay());
             statement.setString(5, fullAddress); // Annahme: Adress-Objekt hat eine Methode toString()
+            statement.setInt(6,selectedHouseholdId);
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -53,7 +54,7 @@ public class PersonDaoImpl implements PersonDao{
 
     // Weitere Methoden für Update, Delete, etc. können hinzugefügt werden
 
-    public void updatePerson(Person person) {
+    public void updatePerson(Person person, int personId) {
         String query = "UPDATE persons SET firstname = ?, lastname = ?, gender = ?, birthday = ?, address = ? WHERE person_id = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -61,8 +62,8 @@ public class PersonDaoImpl implements PersonDao{
             statement.setString(2, person.getLastName());
             statement.setString(3, person.getGender().toString());
             statement.setString(4, person.getBirthDay());
-            statement.setString(5, person.getAdress().getFullAddress());
-            statement.setInt(6, person.getId()); // Angenommen, die ID der Person wird verwendet, um sie zu identifizieren
+            statement.setString(5, person.getAdress().getFullAddress());  //
+            statement.setInt(6, personId);
 
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -94,8 +95,8 @@ public class PersonDaoImpl implements PersonDao{
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-                String firstName = resultSet.getString("first_name");
-                String lastName = resultSet.getString("last_name");
+                String firstName = resultSet.getString("firstname");
+                String lastName = resultSet.getString("lastname");
                 // Weitere Spalten aus der Datenbank lesen und entsprechend der Person zuweisen
                 // Beispiel: Gender, Geburtstag, Adresse, etc.
 
