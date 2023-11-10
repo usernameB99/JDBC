@@ -28,39 +28,39 @@ public class Verwaltung {
             int selectedHouseholdId = 0;
             String selectedHouseholdName = "";
 
+            System.out.println("Guten Tag, zum Auswählen geben Sie die entsprechende Zahl ein und dücken Sie anschließend Enter.");
+            do {
 
-            do {  //--------------------------------------------------------------------------- haushalt section
-                System.out.println("wählen sie:");
-                System.out.println("1.) Haushalt auswählen aus liste");
-                System.out.println("2.) Haushalt erstellen neue");
+                System.out.println("1.) Lassen Sie sich die Liste mit verfügbaren Haushalten anzeigen");
+                System.out.println("2.) Hier können Sie einen neuen Haushalt erstellen");
                 select = sc.nextInt();
 
                 if (select == 1) {  // GET HAUSHALT
                     if (verwaltung.householdDao.getAllHouseholds().size() == 0) {
-                        System.out.println("nix haushalt innen diese");
+                        System.out.println("In der Liste der verfügbaren Haushalte sind noch keine Haushalte enthalten");
                     } else {
 
                         System.out.print("Liste mit Haushalten: ");
                         prindAllHousehold(verwaltung);
                         System.out.println();
-                        System.out.println("wählen sie einen haushalt aus den sie verwenden möchteeeen:");
+                        System.out.println("Wählen Sie einen Haushalt aus den Sie verwenden möchten:");
                         select = sc.nextInt();
                         selectedHouseholdId = selectedHousehold(verwaltung, select);  //choose haushalt, get id
                         System.out.println(selectedHouseholdId); //kontrollausgabe
 
                     }
                 } else if (select == 2) {    //ADD HAUSHALT
-                    System.out.println("Eingabe haushalt name des zu erstellenden haushaltes");
+                    System.out.println("Geben Sie den Namen des zu erstellenden Haushaltes ein:");
                     sc.nextLine();
                     String hNmae = sc.nextLine();
                     Household newHousehold = new Household(hNmae);
                     verwaltung.householdDao.addHousehold(newHousehold);  //neuer haushalt in datenbank eini
                     selectedHouseholdId = verwaltung.householdDao.getHouseholdId(hNmae);  // get id from creates haushalt
-                    System.out.println(selectedHouseholdId);   //kontrollausgabe
+                    System.out.println("Sieh haben den Haushalt " + hNmae + " erstellt");   //kontrollausgabe
                 }
 
-                System.out.println("wollen sie einen neuen haushalt erstellen oder mit dem erstellten/ausgewählten fortfahren?");
-                System.out.println("1.) fortfahren\n2.) noch einen Haushalt erstellen");
+                System.out.println("Möchten Sie mit diesem Haushalt fortfahren oder einen neuen Haushalt erstellen?");
+                System.out.println("1.) fortfahren\n2.) einen weiteren Haushalt erstellen");
                 select = sc.nextInt();
                 if (select == 1) {
                     contHouseheld = false;
@@ -76,19 +76,20 @@ public class Verwaltung {
 
             do{
 
-            System.out.println("was wollen sie mit diesem haushalt machen? " + selectedHouseholdName);
-            System.out.println("1.) Haushalt update");
-            System.out.println("2.) Haushalt delete");
-            System.out.println("3.) read all Persons from this haushalt");
-            System.out.println("4.) add Person to this haushalt");
+
+            System.out.println("Was wollen Sie als nächstes machen? *ausgewählter Haushalt: " + selectedHouseholdName + " *");
+            System.out.println("1.) Haushalt umbenennen");
+            System.out.println("2.) Haushalt löschen");
+            System.out.println("3.) Liste mit Personen anzeigen die diesem Haushalt zugewiesen sind");
+            System.out.println("4.) Eine Person zu diesem Haushalt hinzufügen");
             select = sc.nextInt();
 
             if (select == 1) {  //UPDATE HAUSHALD
-                System.out.println("geben sie einen neuen namen für den haushalt ein:");
+                System.out.println("Geben Sie einen neuen Namen für den Haushalt ein:");
                 sc.nextLine();
                 String newName = sc.nextLine();
                 verwaltung.householdDao.updateHousehold(selectedHouseholdId, newName);
-                System.out.println("name wurde von " + selectedHouseholdName + " auf " + newName + " geändert");
+                System.out.println("Der Name des Haushaltes wurde von " + selectedHouseholdName + " auf " + newName + " geändert");
                 selectedHouseholdName = newName;  //reassign haushaltname
 
             } else if (select == 2) {  // DELETE HAUSHALT
@@ -103,34 +104,42 @@ public class Verwaltung {
                 }
             } else if (select == 3) { //select person from selected haushalt
                 if (verwaltung.personDao.getPersonsByHousehold(selectedHouseholdId).size() == 0) {
-                    System.out.println("es sind keine personen in diesem haushalt");
+                    System.out.println("Es sind keine Personen in diesem Haushalt zugewiesen");
                 } else {
 
                     System.out.print("Liste mit Personen in " + selectedHouseholdName + ": ");
                     printPersonsFromHousehold(verwaltung, selectedHouseholdId);   //method print persons in selected household()
                     System.out.println();
-                    System.out.println("wählen sie eine Person mit der sie was machen möchteeeen:");
+                    System.out.println("wählen sie eine Person mit der sie was machen möchten:");
                     select = sc.nextInt();
 
                     selectedPersonId = selectPerson(verwaltung, select, selectedHouseholdId);  //choose person, get id
                     System.out.println("Kontrollausgabe selected person id: " + selectedPersonId); //kontrollausgabe
+
+
+                    System.out.println("Wollen Sie mit dieser Person fortfahren, eine andere Person auswählen, oder eine neue Person erstellen?");
+                    System.out.println("1.) fortfahren\n2.) eine andere Person auswählen, eine weitere Person erstellen");
+                    select = sc.nextInt();
+                    if (select == 1) {
+                        contPersonSection = false;
+                    }
                 }
             } else if (select == 4) { // create person & later get id by name after creation
 
                 selectedPersonId = createPerson(verwaltung, selectedHouseholdId); //erstellen von person und rückagbe von person id
-            }
 
-
-
-                System.out.println("wollen sie eine neue person erstellen oder mit der erstellten/ausgewählten fortfahren?");
-                System.out.println("1.) fortfahren\n2.) noch eine Person erstellen");
+                System.out.println("Wollen Sie mit dieser Person fortfahren, eine andere Person auswählen, oder eine neue Person erstellen?");
+                System.out.println("1.) fortfahren\n2.) eine andere Person auswählen, eine weitere Person erstellen");
                 select = sc.nextInt();
                 if (select == 1) {
                     contPersonSection = false;
                 }
-                sc.nextLine();
-        } while (contPersonSection);
+            }
 
+
+
+                //sc.nextLine();
+        } while (contPersonSection);
 
             int selectedPetId = 0;
             String selectedPetName = "";
@@ -173,23 +182,31 @@ public class Verwaltung {
                     select = sc.nextInt();
                     selectedPetId = selectPet(verwaltung, select, selectedPersonId);
                     System.out.println("Kontrollausgabe selected pet id: " + selectedPetId); //kontrollausgabe
+
+                    System.out.println("wollen sie eine neues Haustier erstellen oder mit der erstellten/ausgewählten fortfahren?");
+                    System.out.println("1.) fortfahren\n2.) noch ein Haustier erstellen");
+                    select = sc.nextInt();
+                    if (select == 1) {
+                        contPetSection = false;
+                    }
                 }
 
             } else if (select == 4) { //add pet
                 selectedPetId = createPet(verwaltung, selectedPersonId);
+
+                System.out.println("wollen sie eine neues Haustier erstellen oder mit der erstellten/ausgewählten fortfahren?");
+                System.out.println("1.) fortfahren\n2.) noch ein Haustier erstellen");
+                select = sc.nextInt();
+                if (select == 1) {
+                    contPetSection = false;
+                }
             }
 
-              System.out.println("wollen sie eine neues Haustier erstellen oder mit der erstellten/ausgewählten fortfahren?");
-              System.out.println("1.) fortfahren\n2.) noch ein Haustier erstellen");
-              select = sc.nextInt();
-              if (select == 1) {
-                  contPetSection = false;
-              }
-              sc.nextLine();
+
+              //sc.nextLine();
         } while(contPetSection);
 
           do{
-
 
             System.out.println("was wollen sie mit dem Haustier " + selectedPetName + " machen?");
             System.out.println("1.) Haustier bearbeiten");

@@ -10,7 +10,5 @@ public class Main {
 
         verwaltung.doAllStuff(connection);
 
-
-
     }
 }
