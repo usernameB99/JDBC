@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 public interface HouseholdDao {
 
-    public void addHousehold(Household household);
+    public int addHousehold(Household household) throws Exception;
 
     public List <Household> getAllHouseholds();
 

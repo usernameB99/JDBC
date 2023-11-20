@@ -15,15 +15,21 @@ public class HouseholdDaoImpl implements HouseholdDao {
     }
 
     // Methode zum Hinzufügen eines Haushalts in die Datenbank
-    public void addHousehold(Household household) {                                          //return id here zum weiterarbeiten
-        String query = "INSERT INTO households (name) VALUES (?)";
+    public int addHousehold(Household household) throws Exception {                                     //return id here zum weiterarbeiten
 
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, household.getName());
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            // Hier sollte die Fehlerbehandlung erfolgen
+        if (getHouseholdId(household.getName()) == 0) {
+            String query = "INSERT INTO households (name) VALUES (?)";
+
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, household.getName());
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                // Hier sollte die Fehlerbehandlung erfolgen
+            }
+            return getHouseholdId(household.getName());
+        } else {
+            throw new Exception("Household already exists");
         }
     }
 
