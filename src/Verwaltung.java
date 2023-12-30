@@ -20,23 +20,11 @@ public class Verwaltung {
         boolean contPetEditSection = true;
 
         welcome();
-//        boolean closeProgramm = false;
-//        do {
 
             do { // do all
                 int selectedHouseholdId = 0;
                 String selectedHouseholdName = "";
                 do {
-//                    switch (askWhatToDoHouseholdStart(sc)) {
-//                        case 1:
-//                            selectedHouseholdId = getHousehold(verwaltung, sc, selectedHouseholdId);
-//                            break;
-//                        case 2:
-//                            selectedHouseholdId = addHousehold(verwaltung, sc);
-//                            break;
-//                    }
-
-
                     select = askWhatToDoHouseholdStart(sc);
                     if (select == 1) {  // GET HAUSHALT
                         selectedHouseholdId = getHousehold(verwaltung, sc, selectedHouseholdId);
@@ -94,10 +82,6 @@ public class Verwaltung {
                         contPetSection = continueSelectPetSection(sc, contPetSection);
                     }
                 } while (contPetSection);
-//                if (selectedPetId == 0) continue;
-//                if (selectedPetId == ":q!"){
-//                    break;
-//                }
                 do {
                     select = whatToDoWithSelectedPetSection(sc, selectedPetName);
                     if (select == 1) { //update pet
@@ -109,7 +93,6 @@ public class Verwaltung {
                     contPetEditSection = continueEditPetOrBackToStart(sc, contPetEditSection);
                 } while (contPetEditSection);
             } while (cont);
-//        } while (!closeProgramm);
     }
 
     public void deleteHousehold(Verwaltung verwaltung, int selectedHouseholdId, String selectedHouseholdName) {
@@ -523,7 +506,6 @@ public class Verwaltung {
             System.out.println("Sie haben das Programm mit :q! beendet...");
             System.exit(0);
         }
-        // System.out.println("---------checkForProgramTermination passed---------");
         return input;
     }
 
@@ -539,7 +521,6 @@ public class Verwaltung {
             System.out.println("Sie haben das Programm mit :q! beendet...");
             System.exit(0);
         }
-        // System.out.println("---------checkForProgramTermination passed---------");
         return Integer.parseInt(input);
     }
 
@@ -554,10 +535,8 @@ public class Verwaltung {
 
                 if (name.matches(".*\\d.*")) {
                     System.out.println("----- input has number ----- exit false");
-                    //name= nameScanner.nextLine();
                     throw new RuntimeException("Ungültiger Name: Der Name darf keine Zahlen enthalten.");
                 } else {
-                    //  System.out.println("----- returninger bei void person shit passed----- ");
                     stay = false;
                     return name;
                 }
