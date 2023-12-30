@@ -15,19 +15,18 @@ public class PersonDaoImpl implements PersonDao{
     public void addPerson(Person person, int selectedHouseholdId) {
         String query = "INSERT INTO persons (firstname, lastname, gender, birthday, address, household_id) VALUES (?, ?, ?, ?, ?, ?)";                                //household id
 
-        String fullAddress = person.getAdress().getFullAddress(); // Hier wird die vollständige Adresse als String abgerufen
+        String fullAddress = person.getAdress().getFullAddress();
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, person.getFirstName());
             statement.setString(2, person.getLastName());
-            statement.setString(3, person.getGender().toString()); // Wenn das Gender-Objekt in einen String umgewandelt werden kann
+            statement.setString(3, person.getGender().toString()); //Gender-Objekt to String
             statement.setString(4, person.getBirthDay());
-            statement.setString(5, fullAddress); // Annahme: Adress-Objekt hat eine Methode toString()
+            statement.setString(5, fullAddress);
             statement.setInt(6,selectedHouseholdId);
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            // Hier sollte die Fehlerbehandlung erfolgen
         }
     }
 
@@ -38,21 +37,12 @@ public class PersonDaoImpl implements PersonDao{
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                // Hier müsste der Code ergänzt werden, um Personen aus dem ResultSet zu erstellen und zur Liste hinzuzufügen
-                // Beispiel: String firstName = resultSet.getString("first_name");
-                //            ... (Analog für die anderen Attribute)
-                //            Person person = new Person(firstName, ...);
-                //            persons.add(person);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            // Hier sollte die Fehlerbehandlung erfolgen
         }
-
         return persons;
     }
-
-    // Weitere Methoden für Update, Delete, etc. können hinzugefügt werden
 
     public void updatePerson(Person person, int personId) {
         String query = "UPDATE persons SET firstname = ?, lastname = ?, gender = ?, birthday = ?, address = ? WHERE person_id = ?";
@@ -62,27 +52,24 @@ public class PersonDaoImpl implements PersonDao{
             statement.setString(2, person.getLastName());
             statement.setString(3, person.getGender().toString());
             statement.setString(4, person.getBirthDay());
-            statement.setString(5, person.getAdress().getFullAddress());  //
+            statement.setString(5, person.getAdress().getFullAddress()); 
             statement.setInt(6, personId);
 
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            // Hier sollte die Fehlerbehandlung erfolgen
         }
     }
 
-    // Methode zum Löschen einer Person aus der Datenbank
     public void deletePerson(int personId) {
         String query = "DELETE FROM persons WHERE person_id = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, personId); // Löschen anhand der Person-ID
+            statement.setInt(1, personId);                                           // Löschen anhand der Person-ID
 
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            // Hier sollte die Fehlerbehandlung erfolgen
         }
     }
 
@@ -97,15 +84,12 @@ public class PersonDaoImpl implements PersonDao{
             while (resultSet.next()) {
                 String firstName = resultSet.getString("firstname");
                 String lastName = resultSet.getString("lastname");
-                // Weitere Spalten aus der Datenbank lesen und entsprechend der Person zuweisen
-                // Beispiel: Gender, Geburtstag, Adresse, etc.
 
                 Person person = new Person(firstName, lastName);
                 persons.add(person);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            // Hier sollte die Fehlerbehandlung erfolgen
         }
         return persons;
     }
