@@ -33,6 +33,3 @@ public class DatabaseConnector {
         return null;
     }
 }
-
-
-//System.out.println("Erfolgreich mit der Datenbank verbunden!");
