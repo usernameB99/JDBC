@@ -21,7 +21,6 @@ public class PetDaoImpl implements PetDao{
 
         } catch (SQLException e) {
             e.printStackTrace();
-            // Hier sollte die Fehlerbehandlung erfolgen
         }
     }
 
@@ -35,18 +34,14 @@ public class PetDaoImpl implements PetDao{
                 String name = resultSet.getString("name");
                 String age = resultSet.getString("age");
                 String animalType = resultSet.getString("type");
-                //int id = resultSet.getInt("person_id");                                                                                 //added id
                 Pet pet = new Pet(name, age, animalType);
                 pets.add(pet);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            // Hier sollte die Fehlerbehandlung erfolgen
         }
-
         return pets;
     }
-
 
     public void updatePet(Pet pet, int selectedPetId) {
         String query = "UPDATE pets SET name = ?, age = ?, type = ? WHERE pet_id = ?";
@@ -59,7 +54,6 @@ public class PetDaoImpl implements PetDao{
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            // Hier sollte die Fehlerbehandlung erfolgen
         }
     }
 
@@ -71,32 +65,8 @@ public class PetDaoImpl implements PetDao{
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            // Hier sollte die Fehlerbehandlung erfolgen
         }
     }
-
-//    public Pet getPetByPersonId(int personId) {
-//        String query = "SELECT * FROM pets WHERE person_id = ?";
-//        Pet pet = null;
-//
-//        try (PreparedStatement statement = connection.prepareStatement(query)) {
-//            statement.setInt(1, personId);
-//            ResultSet resultSet = statement.executeQuery();
-//            if (resultSet.next()) {
-//                String name = resultSet.getString("name");
-//                int age = resultSet.getInt("age");
-//                String animalType = resultSet.getString("type");
-//                //int id = resultSet.getInt("person_id");                                                                                 //added person_id
-//
-//                pet = new Pet(name, age, animalType);
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//            // Hier sollte die Fehlerbehandlung erfolgen
-//        }
-//
-//        return pet;
-//    }
 
     public ArrayList<Pet> getAllPetsByPersonId(int personId) {
         ArrayList<Pet> pets = new ArrayList<>();
@@ -116,14 +86,11 @@ public class PetDaoImpl implements PetDao{
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            // Hier sollte die Fehlerbehandlung erfolgen
         }
         return pets;
     }
 
-
     public int getPetId(String name){
-
         String query = "SELECT pet_id FROM pets WHERE name = ?";
 
         int petId = 0;
@@ -138,8 +105,6 @@ public class PetDaoImpl implements PetDao{
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return petId;
     }
-
 }
