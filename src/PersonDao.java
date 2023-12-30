@@ -11,11 +11,8 @@ public interface PersonDao {
 
     public List<Person> getAllPersons();
 
-    // Weitere Methoden für Update, Delete, etc. können hinzugefügt werden
-
     public void updatePerson(Person person, int personId);
 
-    // Methode zum Löschen einer Person aus der Datenbank
     public void deletePerson(int personId);
 
     public ArrayList<Person> getPersonsByHousehold(int householdId);
