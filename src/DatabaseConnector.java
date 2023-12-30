@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
 
-
 public class DatabaseConnector {
     private static final String URL = "jdbc:mysql://localhost:3306/javajdbcneu";
     private static final String USER = "bresl";
@@ -21,7 +20,6 @@ public class DatabaseConnector {
         }
         return connection;
     }
-
 
     private static Connection openConnection() {
         Connection connection;
