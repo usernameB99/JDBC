@@ -66,12 +66,8 @@ public class Person {
         this.adress = adress;
     }
 
-    //methode string to string
     public String toString() {
-        //System.out.println(Person);
-
         String result = firstName + lastName + gender + birthDay + adress.toString();
-
         return result;
     }
 }
