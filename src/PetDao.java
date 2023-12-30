@@ -11,14 +11,9 @@ public interface PetDao {
 
     public List<Pet> getAllPets();
 
-    // Weitere Methoden für Update, Delete, etc. können hinzugefügt werden
-
     public void updatePet(Pet pet, int selectedPetId);
 
     public void deletePet(int petId);
-
-   // public Pet getPetByPersonId(int personId);
-
 
     public ArrayList<Pet> getAllPetsByPersonId(int personId);
 
