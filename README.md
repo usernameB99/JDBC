@@ -10,3 +10,6 @@ I used dao classes for the implementation.
 - Pets can be created, updated and deleted, aswell as previewed by a list from a person.
 - Every object creatd gets a uniqe id, so having the same name, age, adress, etc. is no problem.
 - The management sytem can be controled with inputs in the console.
+
+## Screenshots
+![jdbc](https://github.com/usernameB99/JDBC/assets/141931535/03b1a1f5-5a04-47ed-9ed8-00a7362b94f8)
